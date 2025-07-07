@@ -22,15 +22,15 @@ class Load(BaseModel):
     dimensions_unit: str
 
 class CallData(BaseModel):
-    call_id: Optional[int] = None
+    call_id: Optional[str] = None
     carrier_mc: Optional[str] = None
     load_id: Optional[int] = None
     original_rate: Optional[float] = None
-    negotiation_count: Optional[int] = 0
-    counter_offers: Optional[int] = None
     final_rate: Optional[float] = None
+    negotiation_count: Optional[int] = 0
     outcome: Optional[str] = None
     sentiment: Optional[str] = None
+    duration: Optional[int] = None
 
 class CounterOffer(BaseModel):
     load_id: str

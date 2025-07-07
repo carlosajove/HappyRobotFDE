@@ -58,14 +58,14 @@ class CallSession(Base):
     __tablename__ = "call_sessions"
     
     id = Column(Integer, primary_key=True)
-    carrier_mc = Column(String)
+    call_id = Column(String, unique=True)
+    carrier_mc = Column(Integer)
     load_id = Column(Integer, ForeignKey('loads.load_id'))
     original_rate = Column(Float)
     final_rate = Column(Float)
+    negotiation_count = Column(Integer, default=0)
     outcome = Column(String)
     sentiment = Column(String)
-    negotiation_count = Column(Integer, default=0)
-    start_time = Column(DateTime, default=datetime.now())
-    end_time = Column(DateTime)
+    duration = Column(Integer)
     
     load = relationship("Load", backref="call_sessions")

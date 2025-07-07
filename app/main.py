@@ -129,27 +129,22 @@ def start_call(api_key: str = Depends(verify_api_key), db = Depends(get_db)):
 @app.post("/call/end")
 def end_call(call_data: CallData, db = Depends(get_db)):
     """End call and extract final data"""
-    if call_data.id:
-        call_session = db.query(CallSession).filter(CallSession.id == call_data.id).first()
-        if not call_session:
-            raise HTTPException(status_code=404, detail="Call session not found")
-    else:
-        call_session = CallSession()
 
+    call_session = CallSession()
+    call_session.call_id = call_data.call_id
+    call_session.carrier_mc = call_data.carrier_mc
+    call_session.load_id = call_data.load_id
+    call_session.original_rate = call_data.original_rate
     call_session.final_rate = call_data.final_rate
+    call_session.negotiation_count = call_data.negotiation_count
     call_session.outcome = call_data.outcome
     call_session.sentiment = call_data.sentiment
-    call_session.notes = call_data.notes
-    call_session.end_time = datetime.utcnow()
+    call_session.duration = call_data.duration
     
     db.commit()
     
     return {
-        "call_id": call_data.id,
-        "status": "call_ended",
-        "outcome": call_data.outcome,
-        "sentiment": call_data.sentiment,
-        "transfer_needed": call_data.outcome == "accepted"
+        'response': "success",
     }
 
 if __name__ == "__main__":       
