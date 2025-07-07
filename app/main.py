@@ -97,13 +97,25 @@ def verify_mc(mc: int, api_key: str = Depends(verify_api_key), db = Depends(get_
 
     url = f"https://mobile.fmcsa.dot.gov/qc/services/carriers/docket-number/{mc}?webKey={FMCSA_KEY}"
     
-    new_session = CallSession(
-        carrier_mc=mc
-    )
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    
+        data = response.json()
+        carrier = data["content"][0]["carrier"]
+        response = {
+            "verified": True if (carrier.get("allowedToOperate") == 'Y') else False,
+            "mc_number": mc,
+            "allowedToOperate": carrier.get("allowedToOperate"),
+            "legalName": carrier.get("legalName"),
+            "dbaName": carrier.get("dbaName"),
+            "listedCity": carrier.get("phyCity"),
+            "listedState": carrier.get("phyState"),
+        }
+        return response
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Error verifying MC: {str(e)}")
 
-    db.add(new_session)
-    db.commit()
-    return {'response': True, 'call_id': new_session.call_id}
 
 @app.post("/call/start")
 def start_call(api_key: str = Depends(verify_api_key), db = Depends(get_db)):
