@@ -22,7 +22,7 @@ class Load(BaseModel):
     dimensions_unit: str
 
 class CallData(BaseModel):
-    call_id: str
+    call_id: Optional[int] = None
     carrier_mc: Optional[str] = None
     load_id: Optional[int] = None
     original_rate: Optional[float] = None

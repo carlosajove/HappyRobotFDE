@@ -58,7 +58,6 @@ class CallSession(Base):
     __tablename__ = "call_sessions"
     
     id = Column(Integer, primary_key=True)
-    call_id = Column(Integer, unique=True, autoincrement=True)
     carrier_mc = Column(String)
     load_id = Column(Integer, ForeignKey('loads.load_id'))
     original_rate = Column(Float)

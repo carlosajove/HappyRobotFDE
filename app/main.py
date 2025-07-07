@@ -71,8 +71,6 @@ def handle_counter_offer(counter_offer: CounterOffer, api_key: str = Depends(ver
     load_info = db.query(Load).filter(Load.load_id == counter_offer.load_id).first()
     if not load_info:
         raise HTTPException(status_code=404, detail="Load info not found")
-
-    counter_offer.counter_offer_count += 1
     
     if counter_offer.offer_amount <= load_info.loadboard_rate:
         response = "accepted"
@@ -124,17 +122,20 @@ def start_call(api_key: str = Depends(verify_api_key), db = Depends(get_db)):
     db.commit()
     return {
         'status': 'successfull',
-        'call_id': call_session.call_id,
+        'call_id': call_session.id,
     }
 
 
 @app.post("/call/end")
 def end_call(call_data: CallData, db = Depends(get_db)):
     """End call and extract final data"""
-    call_session = db.query(CallSession).filter(CallSession.call_id == call_data.call_id).first()
-    if not call_session:
-        raise HTTPException(status_code=404, detail="Call session not found")
-    
+    if call_data.id:
+        call_session = db.query(CallSession).filter(CallSession.id == call_data.id).first()
+        if not call_session:
+            raise HTTPException(status_code=404, detail="Call session not found")
+    else:
+        call_session = CallSession()
+
     call_session.final_rate = call_data.final_rate
     call_session.outcome = call_data.outcome
     call_session.sentiment = call_data.sentiment
@@ -144,7 +145,7 @@ def end_call(call_data: CallData, db = Depends(get_db)):
     db.commit()
     
     return {
-        "call_id": call_data.call_id,
+        "call_id": call_data.id,
         "status": "call_ended",
         "outcome": call_data.outcome,
         "sentiment": call_data.sentiment,
