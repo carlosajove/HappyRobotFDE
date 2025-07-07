@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 from app.security import verify_api_key
-from .models import CounterOffer, CallData
+from app.models import CounterOffer, CallData
+from app.db_demo_populate import router as demo_router
 
 load_dotenv() # only dev
 
@@ -13,6 +14,7 @@ API_KEY = os.getenv("API_KEY")
 FMCSA_KEY = os.getenv("FMCSA_API_KEY")
 
 app = FastAPI(title="FDE demo")
+app.include_router(demo_router)
 init_db()
 
 @app.get("/health")
@@ -25,7 +27,6 @@ def health_check():
 
 @app.get("/loads")
 def get_loads(
-    call_id: int, 
     origin: str = None,
     limit: int = 1,
     api_key: str = Depends(verify_api_key),
@@ -37,7 +38,6 @@ def get_loads(
         query = query.filter(Load.origin.ilike(f"%{origin}%"))
     
     loads = query.limit(limit).all()
-    call_session = db.query(CallSession).filter(CallSession.call_id == call_id).first()
 
     return {
         "loads": [
