@@ -7,6 +7,7 @@ from datetime import datetime
 from app.security import verify_api_key
 from app.models import CounterOffer, CallData
 from app.db_demo_populate import router as demo_router
+from app.analytics import router as analytics_router
 
 load_dotenv() # only dev
 
@@ -15,6 +16,7 @@ FMCSA_KEY = os.getenv("FMCSA_API_KEY")
 
 app = FastAPI(title="FDE demo")
 app.include_router(demo_router)
+app.include_router(analytics_router)
 init_db()
 
 @app.get("/health")
