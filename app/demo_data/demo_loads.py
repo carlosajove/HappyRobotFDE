@@ -180,5 +180,24 @@ demo_loads = [
         "miles": 101,
         "dimensions": "120x102x6",
         "dimensions_unit": "inches"
+    },
+    {
+        "load_id": 1011,
+        "origin": "ATLANTA, GA",
+        "destination": "PHILADELPHIA, PA",
+        "pickup_datetime": datetime(2025, 7, 17, 10, 0),
+        "delivery_datetime": datetime(2025, 7, 18, 16, 0),
+        "equipment_type": "Flatbed",
+        "loadboard_rate": 1200.0,
+        "currency": "USD",
+        "notes": "Steel beams - secure properly",
+        "weight": 40000.0,
+        "weight_unit": "lbs",
+        "commodity_type": "Steel",
+        "num_of_pieces": 8,
+        "miles": 450,
+        "dimensions": "120x102x6",
+        "dimensions_unit": "inches"
     }
+
 ]

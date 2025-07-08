@@ -9,7 +9,6 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-# Configuration - Docker will load env vars from .env file
 API_URL = os.getenv("API_URL")
 API_KEY = os.getenv("API_KEY")
 LOCAL_DB = os.getenv("LOCAL_DB", "analytics.db")
@@ -18,7 +17,7 @@ LOCAL_DB = os.getenv("LOCAL_DB", "analytics.db")
 if not os.path.isabs(LOCAL_DB):
     LOCAL_DB = os.path.join(os.getcwd(), LOCAL_DB.split('/')[-1])
 
-print(f"📄 Using database: {LOCAL_DB}")
+print(f"Using database: {LOCAL_DB}")
 
 if not API_URL or not API_KEY:
     print("❌ Error: Missing required environment variables (API_URL, API_KEY)")
@@ -93,7 +92,6 @@ def sync_data():
     loads_response_data = loads_response.json()
     calls_response_data = calls_response.json()
     
-    # Extract the data arrays from the API response
     loads_data = loads_response_data.get("loads", [])
     calls_data = calls_response_data.get("call_sessions", [])
     
@@ -103,7 +101,6 @@ def sync_data():
     
     sync_time = datetime.now().isoformat()
     
-    # Sync loads data (INSERT OR REPLACE for upsert behavior)
     print(f"Syncing {len(loads_data)} loads...")
     for load in loads_data:
         cursor.execute("""
@@ -121,8 +118,7 @@ def sync_data():
             load["commodity_type"], load["num_of_pieces"], load["miles"],
             load["dimensions"], load["dimensions_unit"], sync_time
         ))
-    
-    # Sync calls data (INSERT OR REPLACE for upsert behavior)
+    print(calls_data)
     print(f"Syncing {len(calls_data)} call sessions...")
     for call in calls_data:
         cursor.execute("""
