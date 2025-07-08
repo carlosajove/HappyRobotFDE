@@ -33,7 +33,7 @@ flyctl deploy
 flyctl secrets set API_KEY="your_key" FMCSA_API_KEY="your_key" # (only the first time)
 
 # populate the database with demo-data
-curl -X POST https://happyrobot-fde.fly.dev/populate-all-demo-data -H "api-key: 123454321"
+curl -X POST https://happyrobot-fde.fly.dev/populate-all-demo-data -H "api-key: $API_KEY"
 
 ```
 ⚠️ **Warning**: In production the app uses an in‑memory database, so data is lost whenever the instance restarts or the host sleeps. Reload the demo data before each run.
