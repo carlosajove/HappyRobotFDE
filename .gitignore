@@ -1,5 +1,6 @@
 .env
 *.db
+ssl/
 __pycache__
 # OS
 .DS_Store
