@@ -1,24 +1,13 @@
 version: '3.8'
 
 services:
-  sync-data:
-    image: python:3.11-slim
-    container_name: analytics-sync
-    volumes:
-      - ./metabase-dashboard:/app
-    working_dir: /app
-    env_file:
-      - .env
-    networks:
-      - metabase-network
-    command: sh -c "pip install requests && python sync_data.py"
-
   metabase:
     image: metabase/metabase:latest
     container_name: metabase-local
+    hostname: metabase
     volumes:
       - ./metabase-data:/metabase-data
-      - ./metabase-dashboard:/shared-data
+      - ./metabase-app:/shared-data  # Access to analytics.db
     environment:
       - MB_DB_TYPE=h2
       - MB_DB_FILE=/metabase-data/metabase.db
@@ -28,9 +17,28 @@ services:
     networks:
       - metabase-network
     restart: unless-stopped
+    env_file:
+      - .env  # Load environment variables from main .env file
+
+  sync-app:
+    image: python:3.11-slim
+    container_name: analytics-sync-app
+    volumes:
+      - ./metabase-app:/metabase-app
+      - ./ssl:/ssl  # Mount SSL certificates if available
+    working_dir: /metabase-app
+    environment:
+      - PYTHONPATH=/metabase-app
+    ports:
+      - "8001:8001"
+    networks:
+      - metabase-network
+    restart: unless-stopped
+    env_file:
+      - .env  # Load environment variables from main .env file
+    command: sh -c "pip install -r requirements.txt && python sync_app.py"
     depends_on:
-      sync-data:
-        condition: service_completed_successfully
+      - metabase
 
 networks:
   metabase-network:

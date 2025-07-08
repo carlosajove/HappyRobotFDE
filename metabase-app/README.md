@@ -17,18 +17,25 @@ The local analytics workflow involves:
 
 ## Quick Start
 
-1. **Start everything (sync data + Metabase):**
+1. **Start everything (Metabase + Sync App):**
 
    ```bash
    # From the project root directory
-   docker compose -f docker-compose-metabase.yml up
+   docker compose -f docker-compose-metabase.yml up -d
    ```
 
-   This will:
-   - First sync data from the API to SQLite
-   - Then start Metabase on <http://localhost:3000>
+   This will start:
+   - **Metabase** on <http://localhost:3000>
+   - **Sync App** on <http://localhost:8001>
 
-2. **Access Metabase at <http://localhost:3000>**
+2. **Sync data whenever needed:**
+
+   ```bash
+   # Trigger data sync
+   curl -X POST http://localhost:8001/sync
+   ```
+
+3. **Access Metabase at <http://localhost:3000>**
 
 ## Configuration
 
@@ -85,18 +92,32 @@ When first accessing Metabase:
 - `duration`: Call duration in seconds
 - `synced_at`: When data was last synced
 
+## Sync App Endpoints
+
+The sync app runs on `http://localhost:8001` and provides:
+
+- **GET /** - API information
+- **GET /status** - Check configuration and database status  
+- **POST /sync** - Trigger data sync from API to local database
+
 ## Commands Reference
 
 All commands should be run from the project root directory:
 
 ```bash
-# Start everything (sync + Metabase)
-docker compose -f docker-compose-metabase.yml up
+# Start both Metabase and Sync App
+docker compose -f docker-compose-metabase.yml up -d
+
+# Sync data via API call
+curl -X POST http://localhost:8001/sync
+
+# Check sync app status
+curl http://localhost:8001/status
+
+# View logs
+docker compose -f docker-compose-metabase.yml logs metabase
+docker compose -f docker-compose-metabase.yml logs sync-app
 
 # Stop all services
 docker compose -f docker-compose-metabase.yml down
-
-# Re-sync data (stop and restart to refresh data)
-docker compose -f docker-compose-metabase.yml down
-docker compose -f docker-compose-metabase.yml up
 ```
