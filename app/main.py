@@ -116,38 +116,32 @@ def verify_mc(mc: int, api_key: str = Depends(verify_api_key), db = Depends(get_
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Error verifying MC: {str(e)}")
 
-
-@app.post("/call/start")
-def start_call(api_key: str = Depends(verify_api_key), db = Depends(get_db)):
-    call_session = CallSession()
-    db.add(call_session)
-    db.commit()
-    return {
-        'status': 'successfull',
-        'call_id': call_session.id,
-    }
-
-
 @app.post("/call/end")
 def end_call(call_data: CallData, db = Depends(get_db)):
     """End call and extract final data"""
-
-    call_session = CallSession()
-    call_session.call_id = call_data.call_id
-    call_session.carrier_mc = call_data.carrier_mc
-    call_session.load_id = call_data.load_id
-    call_session.original_rate = call_data.original_rate
-    call_session.final_rate = call_data.final_rate
-    call_session.negotiation_count = call_data.negotiation_count
-    call_session.outcome = call_data.outcome
-    call_session.sentiment = call_data.sentiment
-    call_session.duration = call_data.duration
-    
-    db.commit()
-    
-    return {
-        'response': "success",
-    }
+    try:
+        call_session = CallSession()
+        call_session.call_id = call_data.call_id
+        call_session.carrier_mc = call_data.carrier_mc
+        call_session.load_id = call_data.load_id
+        call_session.original_rate = call_data.original_rate
+        call_session.final_rate = call_data.final_rate
+        call_session.negotiation_count = call_data.negotiation_count
+        call_session.outcome = call_data.outcome
+        call_session.sentiment = call_data.sentiment
+        call_session.duration = call_data.duration
+        db.add(call_session)
+        db.commit()
+        
+        return {
+            'response': "success",
+        }
+    except Exception as e:
+        db.rollback()
+        return {
+            'response': "error",
+            'message': str(e)
+        }
 
 if __name__ == "__main__":       
     uvicorn.run("app.main:app",host="0.0.0.0",port=8080,reload=False)
